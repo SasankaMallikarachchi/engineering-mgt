@@ -12,17 +12,7 @@ class CheckBox extends Component{
         super(props);
         this.handleCheck = this.handleCheck.bind(this);
         this.displayChecked = this.displayChecked.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
     }    
-    componentDidMount(){
-        if(this.props.chkAll === true){
-            this.setState({sAll: true})
-        }
-        else{
-            this.setState({sAll: false})
-        }
-        // console.log("method invoked")
-    }
     handleCheck(e){
         if (this.state.teams.length === 0){
             for(let i=0; i<this.props.getNames.length; i++){

@@ -3,13 +3,14 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CheckBox from './CheckBox';
 
+var pp=2;
 const initState= {
     post: [],
     team_names: [],
     org_names: [],
     teams: [],
+    count: 0,
     checklist: [],
-    isAll: null,
     flag: false,
     selectAll: []
 };
@@ -26,16 +27,26 @@ class RepoTable extends Component{
         this.delete = this.delete.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.setSelectAll = this.setSelectAll.bind(this);
+        this.pagination = this.pagination.bind(this);
+        this.handle_per_page = this.handle_per_page.bind(this);
     }
     componentDidMount(){
+        // axios({
+        //     method: "get",
+        //     url: "http://localhost:9090/home/Repositories"
+        // }).then(res => {
+        //     //console.log(res);
+        //     this.setState({post: res.data});
+        // })
+
         axios({
             method: "get",
-            url: "http://localhost:9090/home/Repositories"
+            url: 'http://localhost:9090/home/getCount'
         }).then(res => {
-            //console.log(res);
-            this.setState({post: res.data});
+            console.log(res.data[0].count)
+            this.setState({count: res.data[0].count});
         })
+        this.pagination(1);
 
         axios({
             method: "get",
@@ -53,6 +64,20 @@ class RepoTable extends Component{
             this.setState({org_names: res.data});
             console.log(this.state.org_names);
         })
+    }
+    pagination = async pgn => {
+        axios({
+            method: "get",
+            url: `http://localhost:9090/home/find/page/${pgn}/${pp}`
+        }).then(res => {
+            this.setState({post: res.data})
+            console.log(this.state.post)
+        })
+    }
+    handle_per_page(e){
+        pp = e.target.value;
+        //console.log(pp);
+        this.componentDidMount();
     }
     getTeamName(t_id){
         for(let i=0; i < this.state.team_names.length;i++){
@@ -158,19 +183,19 @@ class RepoTable extends Component{
             })
         }
     }
-    setSelectAll(){
-        if(this.state.selectAll.length > 0){
-            return true;
-        }else{
-            this.setState({flag: false})
-            return false;
+    render(){  
+        const pageNumbers = [];
+        if(this.state.count !== null){       
+            for(let i=1; i <= Math.ceil(this.state.count/pp); i++){
+                pageNumbers.push(i);
+                console.log(i);
+            }
         }
-    }
-    render(){    
+        let renderPageNumbers;  
         const TableRow = ({repo_id, repo_name, org_id, url, team_id, repo_type }) => {
             return (
                 <tr>
-                    <td><CheckBox rid={repo_id} ref={this.formRef} getNames={this.state.team_names} flagvalue={this.setflag} chkAll={this.setSelectAll}/></td>
+                    <td><CheckBox rid={repo_id} ref={this.formRef} getNames={this.state.team_names} flagvalue={this.setflag}/></td>
                     <td>{repo_name}</td>
                     <td>{this.getOrgName(org_id)}</td>
                     <td>{url}</td>
@@ -179,8 +204,14 @@ class RepoTable extends Component{
                 </tr>
             );
         }
+        renderPageNumbers = pageNumbers.map(number => {
+            return(
+                <span key={number} onClick={() => this.pagination(number)}>{number}</span>
+            )
+        })
         return(
-            <div>
+            <div>   
+                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>              
                 <div className="input-group">
                     <div className="dropdownlabel">                        
                         <label>Change Repository Name  : </label>
@@ -216,23 +247,36 @@ class RepoTable extends Component{
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.post.map((repo, index) => {
-                            return(
-                                <TableRow key={index}
-                                    repo_id={repo.REPOSITORY_ID}
-                                    github_id={repo.GITHUB_ID}
-                                    repo_name={repo.REPOSITORY_NAME}
-                                    org_id={repo.ORG_ID}
-                                    url={repo.URL}
-                                    team_id={repo.TEAM_ID}
-                                    repo_type={repo.REPOSITORY_TYPE}
-                                />
-                            );
-                        })
-                        }
+                        {
+                            this.state.post.map((repo, index) => {
+                                return(
+                                    <TableRow key={index}
+                                        repo_id={repo.REPOSITORY_ID}
+                                        github_id={repo.GITHUB_ID}
+                                        repo_name={repo.REPOSITORY_NAME}
+                                        org_id={repo.ORG_ID}
+                                        url={repo.URL}
+                                        team_id={repo.TEAM_ID}
+                                        repo_type={repo.REPOSITORY_TYPE}
+                                    />
+                                );
+                            })
+                        }  
                     </tbody>
                 </table>
-                    <p>{this.state.flag}</p>
+                <div disabled={!this.state.flag} className="container employees ">
+                    <div className="item form-group input-group">
+                        <p>Items per page :</p>  <select className="form-control selcls sizem"  onChange={this.handle_per_page}>
+                            <option value="2">2</option>
+                             <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div className="item ">
+                        <span onClick={() => this.pagination(1)}>&laquo;</span>
+                            {renderPageNumbers}
+                        <span onClick={() => this.pagination(pageNumbers[pageNumbers.length-1])}>&raquo;</span>
+                    </div>
+                </div>
             </div>
         );
     }
