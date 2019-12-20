@@ -131,7 +131,6 @@ service IssueCount on httpListener {
         http:Response response = new;
         var nm_id = ints:fromString(name_id);
         var jsonpayload = request.getJsonPayload();
-
         if(jsonpayload is json){
             RepoId|error repo_list = RepoId.constructFrom(jsonpayload);
             if(repo_list is RepoId){
@@ -148,12 +147,76 @@ service IssueCount on httpListener {
         string s = convertToString(repo);        
         json j;
         if(nm_id is int){
+            io:println(s,nm_id);
             j = updateTeamNames(<@untained>  s,nm_id);
             response.setPayload(j);
             checkpanic caller->respond(response);
         }
+    }  
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/find/{input}"
     }
+    resource function findByAll(http:Caller caller, http:Request request, string input) {
+        var find_paraN = ints:fromString(input);
+        http:Response response = new;
+        json j;
+        if(find_paraN is int){
+            j = find(find_paraN, input);
+        }else{
+            j = find(0,input);
+        }
+        response.setPayload(j);
+        checkpanic caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/find/page/{page_no}/{per_page}"
+    }
+    resource function viewByPage(http:Caller caller, http:Request request, int page_no, int per_page) {
+        http:Response response= new;
+        json j = getByPage(<@untained>  page_no, per_page);
+        response.setPayload(j);
+        checkpanic caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/getCount"
+    }
+    resource function viewCount(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        json j = getCount();
+        response.setPayload(j);
+        checkpanic caller->respond(response);
+    }
+
+    // @http:ResourceConfig {
+    //     methods: ["DELETE"],
+    //     path: "/remove"
+    // }
+    // resource function delete(http:Caller caller, http:Request request){
+    //     int[] repo= [];
+    //     http:Response response = new;
+    //     var jsonpayload = request.getJsonPayload();
+    //     if(jsonpayload is json){
+    //         RepoId|error repo_list = RepoId.constructFrom(jsonpayload);
+    //         if(repo_list is RepoId){
+    //             repo = repo_list.repo_id;
+    //         }
+    //     }else{
+    //         io:println("not a json");
+    //     }
+    //     string list = convertToString(repo);
+    //     json j = deleteMultiple(<@untained>  list);
+    //     response.setPayload(j);
+    //     checkpanic caller->respond(response); 
+    // }
+      
 }
+
 
 function convertToString(int[] array)returns string{
     string s = "(";

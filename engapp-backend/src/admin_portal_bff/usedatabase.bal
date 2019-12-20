@@ -12,6 +12,10 @@ jdbc:Client employeeDb = new ({
     dbOptions: { use: false }
 });
 
+type TotalR record {
+    int count;
+};
+
 function getAllTeamNames() returns json[]? {
     string sqlString = "SELECT TEAM_Id,TEAM_NAME FROM ENGAPP_TEAMS";
     var teams = employeeDb->select(sqlString, ());
@@ -100,6 +104,7 @@ function getOrgNamebyId(int org_id) returns json{
 
 function updateTeamNames(string repos,int team) returns json{
     json updateStatus;
+    io:print(repos);
     string slqString = "UPDATE ENGAPP_GITHUB_REPOSITORIES SET TEAM_ID = ? WHERE REPOSITORY_ID IN "+repos;
     var ret = employeeDb->update(slqString, team);
     if(ret is jdbc:UpdateResult && ret.updatedRowCount > 0){
@@ -107,6 +112,58 @@ function updateTeamNames(string repos,int team) returns json{
     }
     else{
         updateStatus = {"Status":"error occured"};
+    }
+    return updateStatus;
+}
+
+function deleteMultiple(string repos) returns json{
+    json updateStatus;
+    string sqlString =  "DELETE FROM ENGAPP_GITHUB_REPOSITORIES WHERE REPOSITORY_ID IN "+repos;
+    var ret = employeeDb->update(sqlString);
+    if(ret is jdbc:UpdateResult && ret.updatedRowCount >0){
+        updateStatus =  {"Status":"deleted!"};
+    }
+    else{
+        updateStatus = {"Status":"cannot delete error occured"};
+    }
+    return updateStatus;
+}
+
+function find(int inputN, string input) returns json {
+    json updatestatus = {};
+    string sqlString = "SELECT * FROM ENGAPP_GITHUB_REPOSITORIES WHERE REPOSITORY_ID = ? OR GITHUB_ID = ? OR REPOSITORY_NAME = ? OR ORG_ID = ? OR URL = ? OR TEAM_ID = ? OR REPOSITORY_TYPE = ? ";
+    var ret = employeeDb->select(sqlString, (), inputN, input, input, inputN, input, inputN, input);
+    if(ret is table<record {}>){
+        updatestatus = jsonutils:fromTable(ret);        
+    }
+    else{
+        io:println(ret);
+    }
+    return updatestatus;
+}
+
+function getByPage(int pageNo, int per_page) returns json{
+    json updateStatus = {};
+    int i = (pageNo - 1)* per_page;
+    string sqlString = "SELECT * FROM ENGAPP_GITHUB_REPOSITORIES LIMIT "+i.toString()+", "+per_page.toString();
+    var ret = employeeDb->select(sqlString, ());
+    if(ret is table<record{}>) {
+        updateStatus =  jsonutils:fromTable(ret);
+    }else{
+        io:print(ret);
+    }
+    return updateStatus;
+}
+
+function getCount() returns json{
+    json updateStatus = {};
+    string sqlString = "SELECT COUNT(*) FROM ENGAPP_GITHUB_REPOSITORIES";
+    var ret = employeeDb->select(sqlString, TotalR);
+    if(ret is table<TotalR>){
+        updateStatus = jsonutils:fromTable(ret);
+    }
+    else{
+        io:println(ret);
     }
     return updateStatus;
 }
