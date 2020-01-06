@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CheckBox from './CheckBox';
+import $ from "jquery";
 
-var pp=2;
+var pp=100;
 const initState= {
     post: [],
     team_names: [],
@@ -12,38 +13,48 @@ const initState= {
     count: 0,
     checklist: [],
     flag: false,
-    selectAll: []
+    selectAll: [],
+
+    query: ''
 };
+
+let currentlist;
+let selectAll = [];
 class RepoTable extends Component{
     state = initState;
     constructor(props){
         super(props);
+        this.cancel = '';
         this.formRef = React.createRef();
         this.componentDidMount = this.componentDidMount.bind(this);
         this.getTeamName = this.getTeamName.bind(this);
         this.getOrgName = this.getOrgName.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.setflag = this.setflag.bind(this);
-        this.delete = this.delete.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.pagination = this.pagination.bind(this);
         this.handle_per_page = this.handle_per_page.bind(this);
+        
     }
     componentDidMount(){
-        // axios({
-        //     method: "get",
-        //     url: "http://localhost:9090/home/Repositories"
-        // }).then(res => {
-        //     //console.log(res);
-        //     this.setState({post: res.data});
-        // })
+        
+        $(document).ready(function() {
+            $('.employees tbody').click(function(event) {
+                console.log("row clicked");
+              if (event.target.type !== 'checkbox')
+               {
+                //    console.log(TableRow.repo_id)
+                // $(':checkbox', this).trigger('click');
+              }
+            });
+          });
 
         axios({
             method: "get",
             url: 'http://localhost:9090/home/getCount'
         }).then(res => {
-            console.log(res.data[0].count)
+            // console.log(res.data[0].count)
             this.setState({count: res.data[0].count});
         })
         this.pagination(1);
@@ -52,9 +63,8 @@ class RepoTable extends Component{
             method: "get",
             url: `http://localhost:9090/home/viewTeamNames`
         }).then(res => {
-            //console.log(res.data);
             this.setState({team_names: res.data});
-            console.log(this.state.team_names);
+            // console.log(this.state.team_names);
         })
 
         axios({
@@ -62,8 +72,9 @@ class RepoTable extends Component{
             url: `http://localhost:9090/home/viewOrgNames`
         }).then(res => {
             this.setState({org_names: res.data});
-            console.log(this.state.org_names);
+            // console.log(this.state.org_names);
         })
+
     }
     pagination = async pgn => {
         axios({
@@ -71,8 +82,10 @@ class RepoTable extends Component{
             url: `http://localhost:9090/home/find/page/${pgn}/${pp}`
         }).then(res => {
             this.setState({post: res.data})
-            console.log(this.state.post)
+            currentlist = this.state.post;
+            // console.log(this.state.post)
         })
+       
     }
     handle_per_page(e){
         pp = e.target.value;
@@ -108,18 +121,23 @@ class RepoTable extends Component{
         }
     } 
     handleChange(){
-        var t_id = this.getTeamId(event.target.value); 
-        
-
-        var form = this.formRef.current.state.checklist;
-        if(this.state.selectAll.length > 0){
-            for(let i =0; i<= this.state.post.length; i++){
-                form.push(i);
-            }
+        var t_id = this.getTeamId(event.target.value);
+        var form;
+        if(selectAll.length > 0){
+            form = "all";
             console.log(form)
-        }else{
-
         }
+        else{
+            form = this.formRef.current.state.checklist;
+        }
+        // if(this.state.selectAll.length > 0){
+        //     for(let i =0; i<= this.state.post.length; i++){
+        //         form.push(i);
+        //     }
+        //     console.log(form)
+        // }else{
+
+        // }
         axios({
             method: "put",
             url: `http://localhost:9090/home/update/${t_id}`,
@@ -131,20 +149,6 @@ class RepoTable extends Component{
         })
         window.location.reload(false);
     }
-    delete(){
-        var form = this.formRef.current.state.checklist;
-
-        axios({
-            method: "delete",
-            url: `http://localhost:9090/home/remove`,
-            data: {
-                repo_id: form
-            }
-        }).then(res => {
-            console.log(res);
-        })
-       // window.location.reload(false);
-    }
     setflag(input){
         if( (input === true) || (this.state.selectAll.length) > 0)
             this.setState({flag: true})
@@ -154,48 +158,52 @@ class RepoTable extends Component{
     }
     handleSelectAll(e){
        
-        if(e.target.checked=== true){
-            this.state.selectAll.push(1);
+        if(e.target.checked === true){
+            selectAll.push(1);
             this.setflag(true);
+            console.log(selectAll)
         }
         else{
-            this.state.selectAll.pop();
+            selectAll.pop();
             this.setflag(false);
+            console.log(selectAll)
         }
     }
+    // handleInputChange-v3  
     handleInputChange(e){
         var input = e.target.value;
+        let newlist = [];
+       
         if(input === ""){
+            newlist = currentlist;
             this.componentDidMount();
+
+        }else{
+            newlist = currentlist.filter(item => {
+                const lc = item.REPOSITORY_NAME.toString().toLowerCase();
+                const lc2 = this.getOrgName(item.ORG_ID).toString().toLowerCase();
+                const lc3 = this.getTeamName(item.TEAM_ID).toString().toLowerCase();
+                const lc4 = item.REPOSITORY_TYPE.toString().toLowerCase();
+                const filter = input.toString().toLowerCase();
+                return lc.includes(filter) || lc2.includes(filter) || lc3.includes(filter) || lc4.includes(filter);
+            });
         }
-        else{
-            var i = this.getOrgId(input);
-            console.log(i)
-            if( i === undefined){
-                i = this.getTeamId(input);
-            }
-            axios({
-                method: "get",
-                url: `http://localhost:9090/home/find/${i}`
-            }).then (res => {
-                console.log(res);
-                this.setState({post: res.data});
-            })
-        }
+        this.setState({ post: newlist});
     }
+    
     render(){  
         const pageNumbers = [];
         if(this.state.count !== null){       
             for(let i=1; i <= Math.ceil(this.state.count/pp); i++){
                 pageNumbers.push(i);
-                console.log(i);
+                // console.log(i);
             }
         }
         let renderPageNumbers;  
         const TableRow = ({repo_id, repo_name, org_id, url, team_id, repo_type }) => {
             return (
                 <tr>
-                    <td><CheckBox rid={repo_id} ref={this.formRef} getNames={this.state.team_names} flagvalue={this.setflag}/></td>
+                    <td><CheckBox rid={repo_id} final={selectAll} ref={this.formRef} getNames={this.state.team_names} flagvalue={this.setflag}/></td>
                     <td>{repo_name}</td>
                     <td>{this.getOrgName(org_id)}</td>
                     <td>{url}</td>
@@ -209,14 +217,16 @@ class RepoTable extends Component{
                 <span key={number} onClick={() => this.pagination(number)}>{number}</span>
             )
         })
+
         return(
-            <div>   
+            <div>  
                  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>              
+                 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
                 <div className="input-group">
                     <div className="dropdownlabel">                        
-                        <label>Change Repository Name  : </label>
+                        <label>Change Team Name  : </label>
                     </div>
-                    <div className="form-group">
+                    <div className="form-group ">
                         <select className="form-control"
                         disabled={!this.state.flag} value={this.state.value} onChange={this.handleChange}>
                         {
@@ -228,17 +238,25 @@ class RepoTable extends Component{
                         }
                         </select>  
                     </div>
-                    <div className="md-form mt-0">
+                    <div className="containerSearch">
+                        <label className="search-label input-group" htmlFor="search-input">
+                            <input className="form-control" onChange={this.handleInputChange} 
+                                type="text"  id="search-input" placeholder="Search..."/>
+                            <i className="fa fa-search search-icon"/> 
+                        </label>
+                    </div>
+
+                    {/* old serch bar */}
+                    {/* <div className="md-form mt-0 addPadding">
                         <input className="form-control" type="text" name="id" placeholder="Search here.." onChange={this.handleInputChange}></input>
-                    </div>               
+                    </div>                */}
                 </div>
                 <br></br>
-                <table  className="employees">
+                <div id="table" >
+                <table  className="employees w3-card-4">
                     <thead>
                         <tr>
                             <th><input type="checkbox" onChange={this.handleSelectAll}></input></th>
-                            {/* <th><CheckBox rid={this.setSelectAll}/></th> */}
-                            {/* <th></th> */}
                             <th>Repository Name</th>
                             <th>Organization Name</th>
                             <th>URL</th>
@@ -264,14 +282,21 @@ class RepoTable extends Component{
                         }  
                     </tbody>
                 </table>
-                <div disabled={!this.state.flag} className="container employees ">
-                    <div className="item form-group input-group">
-                        <p>Items per page :</p>  <select className="form-control selcls sizem"  onChange={this.handle_per_page}>
+                </div>
+                <br/>
+                <br/>
+                <div className="input-group">
+                    <div className="dropdownlabel">
+                        <p>Items per page :</p>
+                    </div>
+                    <div className="form-group ">
+                          <select className="form-control"  onChange={this.handle_per_page}>
+                              <option value="1000">all</option>
                             <option value="2">2</option>
                              <option value="4">4</option>
                         </select>
                     </div>
-                    <div className="item ">
+                    <div className="container item ">
                         <span onClick={() => this.pagination(1)}>&laquo;</span>
                             {renderPageNumbers}
                         <span onClick={() => this.pagination(pageNumbers[pageNumbers.length-1])}>&raquo;</span>

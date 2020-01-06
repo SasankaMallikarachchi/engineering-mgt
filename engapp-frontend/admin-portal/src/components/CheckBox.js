@@ -36,7 +36,6 @@ class CheckBox extends Component{
                 if(n>-1)
                     this.state.checklist.splice(n,1);
             }
-            console.log(this.state.checklist);
         }
        
         if(this.state.checklist.length > 0){
@@ -46,12 +45,16 @@ class CheckBox extends Component{
         }
     }
     displayChecked(rid){
-        
+            if(this.props.final.length > 0){
+                return true
+            }
+
             for(let i= 0; i<this.state.checklist.length; i++){
                 if(rid === this.state.checklist[i]){
                     return true;
                 }
             }
+            console.log("visits dischecked")
         
     }
     render(){

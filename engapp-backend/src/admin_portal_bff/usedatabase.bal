@@ -5,9 +5,9 @@ import ballerinax/java.jdbc;
 import ballerina/io;
 
 jdbc:Client employeeDb = new ({
-    url: "",
-    username: "",
-    password: "",
+    url: "jdbc:mysql://localhost:3306/employeedb",
+    username: "root",
+    password: "Todayis01@",
     poolOptions: { maximumPoolSize: 5 },
     dbOptions: { use: false }
 });
@@ -102,10 +102,13 @@ function getOrgNamebyId(int org_id) returns json{
     }
 }
 
-function updateTeamNames(string repos,int team) returns json{
+function updateTeamNames(string repos,int team, int flag = 0) returns json{
     json updateStatus;
     io:print(repos);
     string slqString = "UPDATE ENGAPP_GITHUB_REPOSITORIES SET TEAM_ID = ? WHERE REPOSITORY_ID IN "+repos;
+    if(flag == 1){
+        slqString = "UPDATE ENGAPP_GITHUB_REPOSITORIES SET TEAM_ID = ?";
+    }
     var ret = employeeDb->update(slqString, team);
     if(ret is jdbc:UpdateResult && ret.updatedRowCount > 0){
         updateStatus = {"Status": "updated successfully"};
@@ -129,10 +132,13 @@ function deleteMultiple(string repos) returns json{
     return updateStatus;
 }
 
-function find(int inputN, string input) returns json {
+function find(string input, int inputN = -3 ) returns json {
     json updatestatus = {};
-    string sqlString = "SELECT * FROM ENGAPP_GITHUB_REPOSITORIES WHERE REPOSITORY_ID = ? OR GITHUB_ID = ? OR REPOSITORY_NAME = ? OR ORG_ID = ? OR URL = ? OR TEAM_ID = ? OR REPOSITORY_TYPE = ? ";
-    var ret = employeeDb->select(sqlString, (), inputN, input, input, inputN, input, inputN, input);
+    // string sqlString = "SELECT * FROM ENGAPP_GITHUB_REPOSITORIES WHERE REPOSITORY_ID = ? OR GITHUB_ID = ? OR REPOSITORY_NAME = ? OR ORG_ID = ? OR URL = ? OR TEAM_ID = ? OR REPOSITORY_TYPE = ? ";
+    // var ret = employeeDb->select(sqlString, (), inputN, input, input, inputN, input, inputN, input);
+    string sqlString = "SELECT * FROM  ENGAPP_GITHUB_REPOSITORIES WHERE REPOSITORY_ID LIKE '%"+inputN.toString()+"%' OR GITHUB_ID LIKE '%"+input +"%' OR REPOSITORY_NAME LIKE '%"+input +"%' OR ORG_ID LIKE '%"+inputN.toString()+"%' OR URL LIKE '%"+input +"%'  or TEAM_ID LIKE '%"+inputN.toString()+"%' or REPOSITORY_TYPE LIKE '%"+input +"%'";
+    io:println(input);
+    var ret = employeeDb->select(sqlString, ());
     if(ret is table<record {}>){
         updatestatus = jsonutils:fromTable(ret);        
     }

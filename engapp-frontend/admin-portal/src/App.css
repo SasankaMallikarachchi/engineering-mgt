@@ -73,3 +73,75 @@
 .sizem{
   width: 20px;
 }
+
+.addPadding{
+  padding-left: 20px;
+}
+
+.container{
+  border-radius: 4px;
+  /* padding: 10px; */
+  background-color: #fff;
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  box-sizing: border-box;
+  border-spacing: 10px;
+  float: left;
+}
+
+.item{
+  display: table-cell;
+  /* vertical-align: middle; */
+  /* text-align: center; */
+  padding: 0px 1px;
+  float: left;
+}
+
+.item span {
+  cursor: pointer;
+  color: black;
+  float: left;
+  padding: 5px 14px;
+  /* s text-decoration: none */
+  transition: background-color .3s;
+  border: 1px solid #ddf;
+  border-radius: 4px;
+}
+
+.item span:active {
+  background-color: aqua;
+}
+
+.search-label {
+	position: relative;
+}
+
+.search-icon {
+	position: absolute;
+	top: -10px;
+	font-size: 24px;
+	color: rgb(83, 162, 207);
+  right: 18px;
+  padding-top: 20px;
+}
+
+.highlighted {
+  font-style: normal;
+  background: yellow;
+}
+
+.highlighted:hover {
+  background: lime;
+}
+
+.form-control {
+  width: 100%;
+  padding: 16px;
+  font-size: 36px;
+	font-style: italic;
+	color: #444;
+	box-sizing: border-box;
+  outline: none;
+}
+

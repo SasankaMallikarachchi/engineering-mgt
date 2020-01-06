@@ -129,26 +129,31 @@ service IssueCount on httpListener {
     resource function updateTN(http:Caller caller, http:Request request, string name_id) {
         int[] repo= [];
         http:Response response = new;
+        string s;
+        int flag =0;
         var nm_id = ints:fromString(name_id);
+        
         var jsonpayload = request.getJsonPayload();
         if(jsonpayload is json){
             RepoId|error repo_list = RepoId.constructFrom(jsonpayload);
             if(repo_list is RepoId){
                 repo = repo_list.repo_id;
             }
-            else{
-                io:println("not a repoId");
+            else 
+            {
+                io:println("not a ajson");
+                flag = 1;
             }
         }
         else{
             io:println("not a json");
         }
 
-        string s = convertToString(repo);        
+        s = convertToString(repo);        
         json j;
         if(nm_id is int){
             io:println(s,nm_id);
-            j = updateTeamNames(<@untained>  s,nm_id);
+            j = updateTeamNames(<@untained>  s,nm_id, flag);
             response.setPayload(j);
             checkpanic caller->respond(response);
         }
@@ -163,9 +168,9 @@ service IssueCount on httpListener {
         http:Response response = new;
         json j;
         if(find_paraN is int){
-            j = find(find_paraN, input);
+            j = find(<@untained> input, find_paraN);
         }else{
-            j = find(0,input);
+            j = find(<@untained> input);
         }
         response.setPayload(j);
         checkpanic caller->respond(response);
