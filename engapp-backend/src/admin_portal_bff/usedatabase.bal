@@ -5,9 +5,9 @@ import ballerinax/java.jdbc;
 import ballerina/io;
 
 jdbc:Client employeeDb = new ({
-    url: "",
-    username: "",
-    password: "",
+    url: "jdbc:mysql://localhost:3306/employeedb",
+    username: "root",
+    password: "Todayis01@",
     poolOptions: { maximumPoolSize: 5 },
     dbOptions: { use: false }
 });

@@ -82,9 +82,15 @@ class AppBarMenu extends Component{
     }
     logout(){
         // window.gapi.logout()
-        // document.location.href = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost/application-name/logoutUser";
-        console.log("log out")
-        window.gapi.auth2.getAuthInstance().signOut();
+        document.location.href = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost/application-name/logoutUser";
+        // console.log("log out")
+        // window.gapi.auth2.getAuthInstance().signOut();
+       const auth2 = window.gapi.auth2.getAuthInstance()
+       if(auth2 != null){
+           auth2.logout().then(
+               auth2.disconnect().then(this.logout)
+           )
+       }
         this.setState({ buttonTxt: 'sign up', username: null, pic: null, login_method: null})
     }
       
@@ -232,8 +238,7 @@ class AppBarMenu extends Component{
                         </IconButton> 
                     </div>
                     </Toolbar>
-                </AppBar>
-               
+                </AppBar>      
             </div>
         );
     }
