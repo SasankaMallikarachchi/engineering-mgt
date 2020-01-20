@@ -19,7 +19,7 @@ class CheckBox extends Component{
                 // console.log();
                 this.state.teams.push(this.props.getNames[i].TEAM_NAME.toString());
             }
-            console.log(this.state.teams);
+            // console.log(this.state.teams);
         }
         if(e.target.checked){
             this.state.checklist.push(this.props.rid);
@@ -54,7 +54,7 @@ class CheckBox extends Component{
                     return true;
                 }
             }
-            console.log("visits dischecked")
+            // console.log("visits dischecked")
         
     }
     render(){

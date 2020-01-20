@@ -3,6 +3,9 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CheckBox from './CheckBox';
 import $ from "jquery";
+import AppBarMenu from './AppBar';
+
+// import Mark from "mark.js";
 
 var pp=100;
 const initState= {
@@ -17,7 +20,7 @@ const initState= {
 
     query: ''
 };
-
+let i=0;
 let currentlist;
 let selectAll = [];
 class RepoTable extends Component{
@@ -26,6 +29,7 @@ class RepoTable extends Component{
         super(props);
         this.cancel = '';
         this.formRef = React.createRef();
+        this.formRef2 = React.createRef();
         this.componentDidMount = this.componentDidMount.bind(this);
         this.getTeamName = this.getTeamName.bind(this);
         this.getOrgName = this.getOrgName.bind(this);
@@ -34,22 +38,19 @@ class RepoTable extends Component{
         this.handleSelectAll = this.handleSelectAll.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.pagination = this.pagination.bind(this);
-        this.handle_per_page = this.handle_per_page.bind(this);
-        
+        this.handle_per_page = this.handle_per_page.bind(this);  
     }
     componentDidMount(){
-        
-        $(document).ready(function() {
-            $('.employees tbody').click(function(event) {
-                console.log("row clicked");
-              if (event.target.type !== 'checkbox')
-               {
-                //    console.log(TableRow.repo_id)
-                // $(':checkbox', this).trigger('click');
-              }
-            });
-          });
 
+        // console.log(this.formRef2.current.state.isSignedIn)
+        // if(this.formRef2.current.state.isSignedIn === true){
+            
+        $(document).on('click','tr', function() {
+            if(!$(event.target).is('.employees tr td input:checkbox'))
+            $(this).find('input:checkbox').trigger('click');
+            console.log($(this).input.props.repo_id);                  
+        });
+        
         axios({
             method: "get",
             url: 'http://localhost:9090/home/getCount'
@@ -75,17 +76,17 @@ class RepoTable extends Component{
             // console.log(this.state.org_names);
         })
 
+        // }
     }
     pagination = async pgn => {
+        
         axios({
             method: "get",
-            url: `http://localhost:9090/home/find/page/${pgn}/${pp}`
-        }).then(res => {
-            this.setState({post: res.data})
-            currentlist = this.state.post;
-            // console.log(this.state.post)
-        })
-       
+                url: `http://localhost:9090/home/find/page/${pgn}/${pp}`
+            }).then(res => {
+                this.setState({post: res.data})
+                currentlist = this.state.post;
+            })
     }
     handle_per_page(e){
         pp = e.target.value;
@@ -129,15 +130,7 @@ class RepoTable extends Component{
         }
         else{
             form = this.formRef.current.state.checklist;
-        }
-        // if(this.state.selectAll.length > 0){
-        //     for(let i =0; i<= this.state.post.length; i++){
-        //         form.push(i);
-        //     }
-        //     console.log(form)
-        // }else{
-
-        // }
+        }   
         axios({
             method: "put",
             url: `http://localhost:9090/home/update/${t_id}`,
@@ -169,9 +162,9 @@ class RepoTable extends Component{
             console.log(selectAll)
         }
     }
-    // handleInputChange-v3  
     handleInputChange(e){
         var input = e.target.value;
+        this.setState({ query: input});
         let newlist = [];
        
         if(input === ""){
@@ -189,9 +182,9 @@ class RepoTable extends Component{
             });
         }
         this.setState({ post: newlist});
+        this.keyUpHandler(input);
     }
-    
-    render(){  
+    render(){ 
         const pageNumbers = [];
         if(this.state.count !== null){       
             for(let i=1; i <= Math.ceil(this.state.count/pp); i++){
@@ -220,8 +213,12 @@ class RepoTable extends Component{
 
         return(
             <div>  
-                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>              
-                 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>              
+                <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+                
+                <AppBarMenu ref={this.formRef2}/>
+                <br />
+
                 <div className="input-group">
                     <div className="dropdownlabel">                        
                         <label>Change Team Name  : </label>
@@ -241,7 +238,7 @@ class RepoTable extends Component{
                     <div className="containerSearch">
                         <label className="search-label input-group" htmlFor="search-input">
                             <input className="form-control" onChange={this.handleInputChange} 
-                                type="text"  id="search-input" placeholder="Search..."/>
+                                type="text"  name="search" id="search-input" placeholder="Search..."/>
                             <i className="fa fa-search search-icon"/> 
                         </label>
                     </div>
@@ -252,8 +249,10 @@ class RepoTable extends Component{
                     </div>                */}
                 </div>
                 <br></br>
+                <h4><u>Repositories</u></h4>
+
                 <div id="table" >
-                <table  className="employees w3-card-4">
+                <table className="employees w3-card-4">
                     <thead>
                         <tr>
                             <th><input type="checkbox" onChange={this.handleSelectAll}></input></th>
@@ -301,7 +300,7 @@ class RepoTable extends Component{
                             {renderPageNumbers}
                         <span onClick={() => this.pagination(pageNumbers[pageNumbers.length-1])}>&raquo;</span>
                     </div>
-                </div>
+                        </div>
             </div>
         );
     }

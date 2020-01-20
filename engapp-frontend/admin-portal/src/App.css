@@ -37,6 +37,9 @@
   background-color: #f2f2f2;
 }
 
+.employees tr:nth-child(odd){
+  background-color: white;
+}
 .employees tr:hover {
   background-color: #ddd;
 }
@@ -45,23 +48,12 @@
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #bcc4bc;
+  background-color: #227b7e;
   color: white;
 }
 
 .dropdownlabel{
   padding-top: 7px;
-}
-
-.container{
-  border-radius: 4px;
-  padding: 10px;
-  background-color: #fff;
-  display: table;
-  table-layout: fixed;
-  width: 100%;
-  box-sizing: border-box;
-  border-spacing: 10px;
 }
 
 .item{
@@ -80,7 +72,6 @@
 
 .container{
   border-radius: 4px;
-  /* padding: 10px; */
   background-color: #fff;
   display: table;
   table-layout: fixed;
@@ -88,12 +79,11 @@
   box-sizing: border-box;
   border-spacing: 10px;
   float: left;
+  padding: 10px;
 }
 
 .item{
   display: table-cell;
-  /* vertical-align: middle; */
-  /* text-align: center; */
   padding: 0px 1px;
   float: left;
 }
@@ -103,7 +93,6 @@
   color: black;
   float: left;
   padding: 5px 14px;
-  /* s text-decoration: none */
   transition: background-color .3s;
   border: 1px solid #ddf;
   border-radius: 4px;
@@ -145,3 +134,176 @@
   outline: none;
 }
 
+span.mark {
+  background: red;
+  color: black;
+}
+
+.appbar-search {
+  position: 'relative';
+  border-radius: 5px;
+  background-color: white,0.5;
+  margin-right: 2px;
+  margin-left: 0;
+}
+
+.appbar-search:hover {
+  background-color: darkgray(0.15);
+}
+
+.appbar-search-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  height: 100%;
+
+}
+.app-bar {
+  height: 85px;
+  padding-right: 100px;
+  width: 100%
+}
+.root {
+  flex-grow: 1;
+}
+
+.ib  {
+  position: static;
+  display: inline;
+  left: 1500px;
+  padding-top: 50px;
+  /* box-sizing: border-box; */
+}
+
+.IconButton-label {
+  margin-bottom: 5px;
+  width: 40px;
+  height: 45px;
+  display: flex;
+  align-items: inherit;
+  justify-content: inherit;
+  padding-bottom: 4px;
+  background-color:transparent;
+  align-items: center;
+}
+
+.Icon-root {
+  fill: currentColor;
+  width: 1.4em;
+  height: 1.4em;
+  display: inline-block;
+  transition: fill 200ms
+    cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    transition-property: fill;
+    transition-duration: 200ms;
+    transition-timing-function: 
+    cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  user-select: none;background-color: transparent;
+
+}
+
+.Icon-small {
+  font-size: 1.25rem;
+}
+
+.btnclass {
+  background-color: transparent;
+  border: none;
+}
+
+.gbtn {
+  display: inline-block;
+  background: #fff;
+  border-radius: 30px;
+  height: 45px;
+  width: 45px;
+  padding-top: 11px;
+  padding-left: 10px;
+  border-style: none;
+ 
+}
+
+#customBtn:hover {
+  cursor: pointer;
+}
+
+span.buttonText {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+}
+
+.gitBtn {
+  /* border-radius: 3s0px; */
+  width: 44px;
+  height: 40px;
+  /* padding-bottom: 4px; */
+  background-color: rgb(184, 183, 183);
+  border-color: transparent;
+}
+
+.app-bar-container{
+  float: right;
+  padding-top: 5px;
+}
+
+.footer {
+  position: fixed;
+  /* padding-top: 100px; */
+  width: 100%;
+  height: 170px;
+  background-color: rgb(52, 60, 71);
+  bottom: 3px;  
+  text-align:  center;
+}
+
+.body{
+  width: 100%;
+  position: static;
+  padding-top: 20px;
+  /* height: 1600px; */
+}
+
+.menuitem {
+  border-radius: 20px;
+}
+
+.Date-div {
+  position: fixed;
+  text-align: right;
+  font: bold;
+  color: #ddd;
+  bottom: 2px;
+  right: 0;
+  padding-right: 10px;
+}
+
+.mitem {
+  height: 20px;
+}
+
+.app-search {
+  position: relative;
+  background-color: #ddd;
+}
+
+.logged-name {
+  color: #fff;
+  font-weight: bold;
+  font-family: monospace;
+  border: 1px solid none;
+  height: 44px;
+  width: 150px;
+  padding-top: 8px;
+  margin-top: 17px;
+  font-size: 19px;
+}
+.accPic {
+  height: 50px;
+  width: 50px;
+  border-radius: 25px;
+}

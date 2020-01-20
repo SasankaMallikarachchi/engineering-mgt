@@ -1,31 +1,32 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-//import TeamTable from './components/TeamTable';
 import RepoTable from './components/Repos';
+import AppBarMenu from './components/AppBar';
 
 class App extends Component {
+  constructor(props){
+    super(props);
+    this.state={
+      date: new Date().toLocaleString()
+    };
+  }
   render() {
     return (
-      <div>
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+      <div className="body">
+        <div>
+          {/* <AppBarMenu fun1={this.printInput}/> */}
+            <br />
+          <div className="addPadding">
+              <RepoTable />
+                <br /> <br />  <br /> <br />
+          </div>
         </div>
-        <div className="addPadding">
-          <br/>
-          <br />
-          <br />
-          <h4><u>Repositories</u></h4>
-          <RepoTable />
-          <br />
-          <br />  <br />
-          <br />
-          {/* <h4>Teams</h4>
-          <TeamTable /> */}
-        </div>
+       <footer className="footer">
+            <p className="Date-div">{this.state.date}</p>
+            <p></p>
+       </footer>
       </div>
     );
   }
 }
-
 export default App;
